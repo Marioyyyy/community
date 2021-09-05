@@ -1,0 +1,170 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.lxy.community.mapper.QuestionMapper">
+
+    <resultMap type="com.lxy.community.model.Question" id="QuestionMap">
+        <result property="tag" column="tag" jdbcType="VARCHAR"/>
+        <result property="likeCount" column="like_count" jdbcType="INTEGER"/>
+        <result property="viewCount" column="view_count" jdbcType="INTEGER"/>
+        <result property="commentCount" column="comment_count" jdbcType="INTEGER"/>
+        <result property="creator" column="creator" jdbcType="INTEGER"/>
+        <result property="gmtModified" column="gmt_modified" jdbcType="INTEGER"/>
+        <result property="gmtCreate" column="gmt_create" jdbcType="INTEGER"/>
+        <result property="description" column="description" jdbcType="VARCHAR"/>
+        <result property="title" column="title" jdbcType="VARCHAR"/>
+        <result property="id" column="id" jdbcType="INTEGER"/>
+    </resultMap>
+
+    <!--查询单个-->
+    <select id="queryById" resultMap="QuestionMap">
+        select tag,
+               like_count,
+               view_count,
+               comment_count,
+               creator,
+               gmt_modified,
+               gmt_create,
+               description,
+               title,
+               id
+        from community.question
+        where id = #{id}
+    </select>
+
+    <!--查询指定行数据-->
+    <select id="queryAllByLimit" resultMap="QuestionMap">
+        select tag,
+               like_count,
+               view_count,
+               comment_count,
+               creator,
+               gmt_modified,
+               gmt_create,
+               description,
+               title,
+               id
+        from community.question limit #{offset}, #{limit}
+    </select>
+
+    <!--通过实体作为筛选条件查询-->
+    <select id="queryAll" resultMap="QuestionMap">
+        select
+        tag, like_count, view_count, comment_count, creator, gmt_modified, gmt_create, description, title, id
+        from community.question
+        <where>
+            <if test="tag != null and tag != ''">
+                and tag = #{tag}
+            </if>
+            <if test="likeCount != null">
+                and like_count = #{likeCount}
+            </if>
+            <if test="viewCount != null">
+                and view_count = #{viewCount}
+            </if>
+            <if test="commentCount != null">
+                and comment_count = #{commentCount}
+            </if>
+            <if test="creator != null">
+                and creator = #{creator}
+            </if>
+            <if test="gmtModified != null">
+                and gmt_modified = #{gmtModified}
+            </if>
+            <if test="gmtCreate != null">
+                and gmt_create = #{gmtCreate}
+            </if>
+            <if test="description != null and description != ''">
+                and description = #{description}
+            </if>
+            <if test="title != null and title != ''">
+                and title = #{title}
+            </if>
+            <if test="id != null">
+                and id = #{id}
+            </if>
+        </where>
+    </select>
+
+    <!--新增所有列-->
+    <insert id="insert" keyProperty="id" useGeneratedKeys="true">
+        insert into community.question(tag, like_count, view_count, comment_count, creator, gmt_modified, gmt_create,
+                                       description, title)
+        values (#{tag}, #{likeCount}, #{viewCount}, #{commentCount}, #{creator}, #{gmtModified}, #{gmtCreate},
+                #{description}, #{title})
+    </insert>
+
+    <insert id="insertBatch" keyProperty="id" useGeneratedKeys="true">
+        insert into community.question(tag, like_count, view_count, comment_count, creator, gmt_modified, gmt_create,
+        description, title)
+        values
+        <foreach collection="entities" item="entity" separator=",">
+            (#{entity.tag}, #{entity.likeCount}, #{entity.viewCount}, #{entity.commentCount}, #{entity.creator},
+            #{entity.gmtModified}, #{entity.gmtCreate}, #{entity.description}, #{entity.title})
+        </foreach>
+    </insert>
+
+    <insert id="insertOrUpdateBatch" keyProperty="id" useGeneratedKeys="true">
+        insert into community.question(tag, like_count, view_count, comment_count, creator, gmt_modified, gmt_create,
+        description, title)
+        values
+        <foreach collection="entities" item="entity" separator=",">
+            (#{entity.tag}, #{entity.likeCount}, #{entity.viewCount}, #{entity.commentCount}, #{entity.creator},
+            #{entity.gmtModified}, #{entity.gmtCreate}, #{entity.description}, #{entity.title})
+        </foreach>
+        on duplicate key update
+        tag = values(tag) , like_count = values(like_count) , view_count = values(view_count) , comment_count =
+        values(comment_count) , creator = values(creator) , gmt_modified = values(gmt_modified) , gmt_create =
+        values(gmt_create) , description = values(description) , title = values(title)
+    </insert>
+
+    <!--通过主键修改数据-->
+    <update id="update">
+        update community.question
+        <set>
+            <if test="tag != null and tag != ''">
+                tag = #{tag},
+            </if>
+            <if test="likeCount != null">
+                like_count = #{likeCount},
+            </if>
+            <if test="viewCount != null">
+                view_count = #{viewCount},
+            </if>
+            <if test="commentCount != null">
+                comment_count = #{commentCount},
+            </if>
+            <if test="creator != null">
+                creator = #{creator},
+            </if>
+            <if test="gmtModified != null">
+                gmt_modified = #{gmtModified},
+            </if>
+            <if test="gmtCreate != null">
+                gmt_create = #{gmtCreate},
+            </if>
+            <if test="description != null and description != ''">
+                description = #{description},
+            </if>
+            <if test="title != null and title != ''">
+                title = #{title},
+            </if>
+        </set>
+        where id = #{id}
+    </update>
+
+    <!--通过主键删除-->
+    <delete id="deleteById">
+        delete
+        from community.question
+        where id = #{id}
+    </delete>
+
+    <update id="incrView" parameterType="com.lxy.community.model.Question">
+        update QUESTION
+        set
+            VIEW_COUNT = VIEW_COUNT + #{viewCount,jdbcType=INTEGER}
+        where id = #{id}
+    </update>
+
+</mapper>
+
